@@ -92,7 +92,7 @@ class RequestIntegration implements IntegrationInterface
 
     protected function getServerRequest(?ServerRequestInterface $request): ?ServerRequestInterface
     {
-        if (! empty($request)) {
+        if ($request !== null) {
             return $request;
         }
 
@@ -132,7 +132,7 @@ class RequestIntegration implements IntegrationInterface
 
             $userContext = $event->getUserContext();
 
-            if ($userContext->getIpAddress() === null && isset($serverParams['REMOTE_ADDR'])) {
+            if (isset($serverParams['REMOTE_ADDR']) && $userContext->getIpAddress() === null) {
                 $userContext->setIpAddress($serverParams['REMOTE_ADDR']);
             }
         } else {
