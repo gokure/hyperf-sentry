@@ -16,11 +16,20 @@ use Throwable;
 
 class SentryExceptionHandler extends ExceptionHandler
 {
+    /**
+     * @var ContainerInterface
+     */
     protected $container;
+
+    /**
+     * @var ConfigInterface
+     */
+    protected $config;
 
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
+        $this->config = $container->get(ConfigInterface::class);
     }
 
     /**
@@ -34,12 +43,10 @@ class SentryExceptionHandler extends ExceptionHandler
 
             SentryContext::getHub();
 
-            $config = $this->container->get(ConfigInterface::class);
-
             SentryContext::getHub()->captureException($throwable);
 
             if (($client = $clientBuilder->getClient()) instanceof FlushableClientInterface) {
-                $client->flush((int)$config->get('sentry.flush_timeout', 2));
+                $client->flush((int)$this->config->get('sentry.flush_timeout', 2));
             }
         });
 
@@ -55,7 +62,22 @@ class SentryExceptionHandler extends ExceptionHandler
      */
     public function isValid(Throwable $throwable): bool
     {
-        return true;
+        return !$this->shouldntReport($throwable);
+    }
+
+    /**
+     * Determine if the exception is in the "do not report" list.
+     *
+     * @param Throwable $throwable
+     * @return bool
+     */
+    protected function shouldntReport(Throwable $throwable): bool
+    {
+        $dontReport = $this->config->get('sentry.hyperf.dont_report', []);
+
+        return ! is_null(collect($dontReport)->first(function ($type) use ($throwable) {
+            return $throwable instanceof $type;
+        }));
     }
 
     /**

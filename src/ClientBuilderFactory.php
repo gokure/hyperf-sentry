@@ -28,7 +28,9 @@ class ClientBuilderFactory
             // We resolve the integrations through the container later, so we initially do not pass it to the SDK yet
             $userConfig['integrations'],
             // This is kept for backwards compatibility and can be dropped in a future breaking release
-            $userConfig['breadcrumbs.sql_bindings']
+            $userConfig['breadcrumbs.sql_bindings'],
+            // Not a parts of the sentry.
+            $userConfig['hyperf']
         );
 
         $basePath = defined('\BASE_PATH') ? \BASE_PATH : '';

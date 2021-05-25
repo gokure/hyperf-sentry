@@ -17,4 +17,12 @@ return [
 
     // @see: https://docs.sentry.io/error-reporting/configuration/?platform=php#send-default-pii
     'send_default_pii' => false,
+
+    'hyperf' => [
+        // A list of the exception types that are not reported.
+        'dont_report' => [
+            //\Hyperf\HttpMessage\Exception\HttpException::class,
+            //\Hyperf\Validation\UnauthorizedException::class,
+        ],
+    ],
 ];
